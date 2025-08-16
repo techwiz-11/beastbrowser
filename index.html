@@ -53,7 +53,6 @@ footer{position:absolute;bottom:20px;text-align:center;width:100%;opacity:0.7;fo
 
 <!-- Splash Screen -->
 <div class="splash drip" id="splash">Browser Initiating...</div>
-<audio id="startupSound" src="https://freesound.org/data/previews/64/64588_634166-lq.mp3"></audio>
 
 <div class="watermark drip">Commander Ammad</div>
 
@@ -117,12 +116,10 @@ footer{position:absolute;bottom:20px;text-align:center;width:100%;opacity:0.7;fo
 <script>
 // Splash
 const splash=document.getElementById('splash');
-const sound=document.getElementById('startupSound');
 window.addEventListener('load',()=>{
   const themeColors={'cyan':'#00ffea','pink':'#ff66ff','green':'#66ff66','blood':'#ff0000'};
   splash.style.color=themeColors[document.body.className]||'#00ffea';
   splash.style.opacity=1;
-  sound.play().catch(e=>{});
   setTimeout(()=>{ splash.style.opacity=0; setTimeout(()=>{ splash.style.display='none'; },3000); },3000);
 });
 
