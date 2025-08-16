@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commander Ammad BEAST Browser</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}
+body{overflow:hidden;transition:background 1s,color 1s;}
+body.cyan{background:#0d0d0d;color:#00ffea;}
+body.pink{background:#1a001a;color:#ff66ff;}
+body.green{background:#001a00;color:#66ff66;}
+body.blood{background:#1a0000;color:#ff0000;text-shadow:0 0 15px #ff0000;}
+@keyframes bgPulse{0%{background-position:0 0;}50%{background-position:100% 100%;}100%{background-position:0 0;}}
+body.cyan{background:linear-gradient(120deg,#000,#00ffea,#000);background-size:400% 400%;animation:bgPulse 15s ease infinite;}
+body.pink{background:linear-gradient(120deg,#1a001a,#ff66ff,#1a001a);background-size:400% 400%;animation:bgPulse 15s ease infinite;}
+body.green{background:linear-gradient(120deg,#001a00,#66ff66,#001a00);background-size:400% 400%;animation:bgPulse 15s ease infinite;}
+body.blood{background:linear-gradient(120deg,#1a0000,#ff0000,#1a0000);background-size:400% 400%;animation:bgPulse 15s ease infinite;}
+.drip{font-weight:700;position:relative;color:inherit;text-shadow:0 0 5px currentColor,0 0 10px currentColor,0 0 20px currentColor,0 0 40px currentColor;}
+.drip::after{content:"";position:absolute;width:100%;height:5px;left:0;top:100%;background:currentColor;border-radius:50%;animation:drip 2s infinite;}
+@keyframes drip{0%,100%{height:5px;}50%{height:15px;}}
+header{margin-top:20px;text-align:center;animation:fadeIn 2s;}
+header h1{font-size:2em;z-index:10;}
+.search-container{margin-top:30px;display:flex;justify-content:center;align-items:center;animation:fadeIn 2s 1s;transition:0.5s;}
+.search-container input{padding:10px 20px;width:320px;border:none;border-radius:25px;outline:none;font-size:16px;background:rgba(255,255,255,0.05);color:inherit;box-shadow:0 0 10px currentColor;transition:0.5s;}
+.search-container button{padding:10px 20px;margin-left:10px;border:none;border-radius:25px;font-weight:bold;cursor:pointer;box-shadow:0 0 15px currentColor;transition:0.3s;}
+.search-container button:hover{transform:scale(1.1);}
+.section{margin-top:40px;animation:fadeIn 2s 2s;}
+.section h2{margin-bottom:15px;text-align:center;font-size:1.8em;}
+.buttons-container{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
+.link-btn, .tool-btn, .game-btn{padding:15px 25px;border:none;border-radius:15px;background:rgba(255,255,255,0.05);color:inherit;font-weight:bold;cursor:pointer;box-shadow:0 0 20px currentColor;transition:0.5s;}
+.link-btn:hover, .tool-btn:hover, .game-btn:hover{transform:scale(1.05);}
+.calc, .notes{padding:15px;border-radius:10px;background:rgba(255,255,255,0.05);color:inherit;box-shadow:0 0 15px currentColor;transition:0.5s;margin-top:15px;}
+.calc input, .notes textarea{width:120px;height:30px;margin-top:5px;border:none;border-radius:5px;padding:5px;outline:none;background:rgba(255,255,255,0.1);color:inherit;box-shadow:0 0 10px currentColor;}
+.calc button, .notes button{margin-top:5px;padding:5px 10px;border:none;border-radius:5px;font-weight:bold;cursor:pointer;box-shadow:0 0 10px currentColor;}
+.themes{position:fixed;top:10px;right:10px;display:flex;gap:10px;z-index:1000;}
+.themes button{padding:10px 15px;border:none;border-radius:10px;cursor:pointer;transition:0.3s;font-weight:bold;}
+.themes button:hover{transform:scale(1.1);}
+.particle{position:absolute;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:0.7;pointer-events:none;}
+canvas#lineCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+footer{position:absolute;bottom:20px;text-align:center;width:100%;opacity:0.7;font-size:14px;animation:fadeIn 2s 3.5s;}
+.splash{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;justify-content:center;align-items:center;z-index:9999;font-size:2em;font-weight:bold;opacity:0;transition:opacity 3s ease-in-out;background:#000;}
+.watermark{position:fixed;bottom:10px;right:10px;font-size:16px;color:rgba(255,255,255,0.2);pointer-events:none;z-index:1000;}
+.ttt-board{display:grid;grid-template-columns:repeat(3,100px);grid-gap:5px;justify-content:center;margin:20px auto;}
+.ttt-cell{width:100px;height:100px;border:2px solid currentColor;font-size:3em;text-align:center;line-height:100px;cursor:pointer;transition:0.3s;}
+.ttt-cell:hover{background:rgba(255,255,255,0.1);}
+.snake-canvas{background:rgba(0,0,0,0.2);display:block;margin:20px auto;border:2px solid currentColor;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+</style>
+</head>
+<body class="cyan">
+
+<!-- Splash Screen -->
+<div class="splash drip" id="splash">Browser Initiating...</div>
+<audio id="startupSound" src="https://freesound.org/data/previews/64/64588_634166-lq.mp3"></audio>
+
+<div class="watermark drip">Commander Ammad</div>
+
+<header>
+  <h1 class="drip">Commander Ammad BEAST Browser</h1>
+</header>
+
+<div class="search-container">
+  <input type="text" id="searchBar" placeholder="Search Google...">
+  <button onclick="search()" class="drip">Go</button>
+</div>
+
+<div class="section" id="toolsSection">
+  <h2>Tools</h2>
+  <div class="buttons-container">
+    <button class="tool-btn drip" onclick="openLink('https://www.google.com')">Google</button>
+    <button class="tool-btn drip" onclick="openLink('https://www.youtube.com')">YouTube</button>
+    <button class="tool-btn drip" onclick="openLink('https://mail.google.com')">Gmail</button>
+    <button class="tool-btn drip" onclick="openLink('https://aternos.org')">Aternos</button>
+    <button class="tool-btn drip" onclick="openLink('https://www.wikipedia.org')">Wiki</button>
+  </div>
+</div>
+
+<div class="section" id="gamesSection">
+  <h2>Games</h2>
+  <div class="buttons-container">
+    <button class="game-btn drip" onclick="initTicTacToe()">Tic Tac Toe</button>
+    <button class="game-btn drip" onclick="initSnake()">Snake</button>
+    <button class="game-btn drip" onclick="openLink('https://www.doom.com')">Doom</button>
+    <button class="game-btn drip" onclick="openLink('https://www.cardgames.io')">CardGames.io</button>
+  </div>
+  <div id="tttContainer"></div>
+  <canvas id="snakeCanvas" class="snake-canvas" width="400" height="400"></canvas>
+  <div id="snakeScore" class="drip" style="text-align:center;"></div>
+</div>
+
+<div class="calc drip">
+  <strong>Calculator</strong><br>
+  <input type="text" id="calcInput" placeholder="e.g., 5+3*2">
+  <button onclick="calcResult()">=</button>
+  <div id="calcOutput"></div>
+</div>
+
+<div class="notes drip">
+  <strong>Notes</strong><br>
+  <textarea id="noteArea" placeholder="Write here..." rows="3"></textarea>
+  <button onclick="saveNote()">Save</button>
+  <div id="noteOutput"></div>
+</div>
+
+<div class="themes">
+  <button onclick="setTheme('cyan')" id="themeC" class="drip">Cyan</button>
+  <button onclick="setTheme('pink')" id="themeP" class="drip">Pink</button>
+  <button onclick="setTheme('green')" id="themeG" class="drip">Green</button>
+  <button onclick="setTheme('blood')" id="themeB" class="drip">Blood Lust</button>
+</div>
+
+<footer class="drip">&copy; Commander Ammad | BEAST Browser</footer>
+<canvas id="lineCanvas"></canvas>
+
+<script>
+// Splash
+const splash=document.getElementById('splash');
+const sound=document.getElementById('startupSound');
+window.addEventListener('load',()=>{
+  const themeColors={'cyan':'#00ffea','pink':'#ff66ff','green':'#66ff66','blood':'#ff0000'};
+  splash.style.color=themeColors[document.body.className]||'#00ffea';
+  splash.style.opacity=1;
+  sound.play().catch(e=>{});
+  setTimeout(()=>{ splash.style.opacity=0; setTimeout(()=>{ splash.style.display='none'; },3000); },3000);
+});
+
+// Search & Links
+function search(){ let q=document.getElementById('searchBar').value;if(q) window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank'); }
+function openLink(url){ window.open(url,'_blank'); }
+function calcResult(){ try{ document.getElementById('calcOutput').innerText=eval(document.getElementById('calcInput').value);}catch(e){document.getElementById('calcOutput').innerText='Error';} }
+function saveNote(){ document.getElementById('noteOutput').innerText="Saved: "+document.getElementById('noteArea').value; }
+
+// Themes
+const themeColors={'cyan':'#00ffea','pink':'#ff66ff','green':'#66ff66','blood':'#ff0000'};
+function setTheme(theme){
+  document.body.className=theme;
+  document.querySelectorAll('.drip').forEach(el=>{el.style.color=themeColors[theme];});
+  document.querySelectorAll('.themes button').forEach(btn=>{btn.style.boxShadow='0 0 10px '+themeColors[theme];});
+}
+
+// Tic Tac Toe with smart AI
+function initTicTacToe(){
+  const container=document.getElementById('tttContainer');
+  container.innerHTML='<div class="ttt-board"></div>';
+  const board=document.querySelector('.ttt-board');
+  let cells=Array(9).fill('');
+  const human='X',ai='O';
+  let gameOver=false;
+
+  function render(){
+    board.innerHTML='';
+    cells.forEach((c,i)=>{
+      const cell=document.createElement('div');
+      cell.className='ttt-cell drip';
+      cell.innerText=c;
+      cell.onclick=()=>{ 
+        if(cells[i]==='' && !gameOver){ 
+          cells[i]=human; 
+          render(); 
+          if(!checkWin(human)){ aiMove(); render(); } 
+        } 
+      };
+      board.appendChild(cell);
+    });
+  }
+
+  function aiMove(){
+    const winMove=findBestMove(ai);
+    const blockMove=findBestMove(human);
+    const empty=cells.map((v,i)=>v===''?i:-1).filter(i=>i!==-1);
+    let move=winMove!==-1?winMove:blockMove!==-1?blockMove:-1;
+    if(move===-1){ if(cells[4]==='') move=4; else move=[0,2,6,8].find(i=>cells[i]==='')||empty[0]; }
+    if(move!==-1) cells[move]=ai;
+    checkWin(ai);
+  }
+
+  function findBestMove(player){
+    const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for(let w of wins){
+      let vals=w.map(i=>cells[i]);
+      if(vals.filter(v=>v===player).length===2 && vals.includes('')) return w[vals.indexOf('')];
+    }
+    return -1;
+  }
+
+  function checkWin(p){
+    const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for(let w of wins){ if(w.every(i=>cells[i]===p)){alert(p+' wins!'); gameOver=true; return true; } }
+    if(cells.every(c=>c!=='')){alert("Draw!"); gameOver=true; return true;}
+    return false;
+  }
+
+  render();
+}
+
+// Snake Game
+let snake=[],food={},score=0,snakeInterval;
+function initSnake(){
+  clearInterval(snakeInterval);
+  snake=[{x:5,y:5}]; score=0;
+  placeFood();
+  snakeInterval=setInterval(moveSnake,150);
+}
+
+function placeFood(){ food={x:Math.floor(Math.random()*20),y:Math.floor(Math.random()*20)}; }
+
+let dir={x:1,y:0};
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowUp' && dir.y!==1)dir={x:0,y:-1};
+  if(e.key==='ArrowDown' && dir.y!==-1)dir={x:0,y:1};
+  if(e.key==='ArrowLeft' && dir.x!==1)dir={x:-1,y:0};
+  if(e.key==='ArrowRight' && dir.x!==-1)dir={x:1,y:0};
+});
+
+function moveSnake(){
+  const head={x:snake[0].x+dir.x, y:snake[0].y+dir.y};
+  if(head.x<0||head.x>=20||head.y<0||head.y>=20||snake.some(s=>s.x===head.x && s.y===head.y)){
+    clearInterval(snakeInterval);
+    alert('Game Over! Score: '+score);
+    return;
+  }
+  snake.unshift(head);
+  if(head.x===food.x && head.y===food.y){ score++; placeFood(); }
+  else{ snake.pop(); }
+  drawSnake();
+}
+
+function drawSnake(){
+  const canvas=document.getElementById('snakeCanvas');
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle=themeColors[document.body.className]||'#00ffea';
+  snake.forEach(s=>{ ctx.fillRect(s.x*20,s.y*20,20,20); });
+  ctx.fillStyle='yellow'; ctx.fillRect(food.x*20,food.y*20,20,20);
+  document.getElementById('snakeScore').innerText='Score: '+score;
+}
+</script>
+</body>
+</html>
